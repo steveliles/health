@@ -5,6 +5,14 @@ import java.util.*;
 
 import com.sjl.health.*;
 
+/**
+ * Enables monitoring of all methods of all interfaces implemented by a class. 
+ * 
+ * Methods declared in the class which do not implement a method of an interface
+ * are NOT monitored!
+ * 
+ * @author steve
+ */
 public abstract class AbstractDynamicProxyingHealthService implements HealthService {
 
 	interface Handler {
