@@ -13,7 +13,7 @@ import com.sjl.health.*;
  * 
  * @author steve
  */
-public abstract class AbstractDynamicProxyingHealthService implements HealthService {
+public class DynamicProxyingHealthService implements HealthService {
 
 	interface Handler {
 		public Object handle(OperationMonitor aMonitor, Object aProxied, Object[] anArgs) 
@@ -21,24 +21,24 @@ public abstract class AbstractDynamicProxyingHealthService implements HealthServ
 	}
 	
 	private Object lock = new Object();
+	private HealthFactory healthFactory;
 	private Map<Class<?>, Map<Method, Handler>> instrumentedClasses;
-	private Map<Object, Health> monitoredComponents;
+	private Map<Object, HealthInfo> monitoredComponents;
 	
-	public AbstractDynamicProxyingHealthService() {
+	public DynamicProxyingHealthService(HealthFactory aHealthFactory) {
+		healthFactory = aHealthFactory;
 		// use weakhashmaps so we don't create memory leaks by
 		// hanging onto components or classes beyond their natural 
 		// lifecycle.
-		monitoredComponents = new WeakHashMap<Object, Health>();
+		monitoredComponents = new WeakHashMap<Object, HealthInfo>();
 		instrumentedClasses = new WeakHashMap<Class<?>, Map<Method, Handler>>();
 	}
-	
-	protected abstract UpdateableHealth newUpdateableHealth();
 	
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T monitor(final T aComponent) {
 		final Map<Method, Handler> _handlers = getHandlers(aComponent.getClass());
-		final UpdateableHealth _health = newUpdateableHealth();
+		final Health _health = healthFactory.newHealth();
 		
 		T _instrumented = (T) Proxy.newProxyInstance(
 			aComponent.getClass().getClassLoader(), 
@@ -46,13 +46,13 @@ public abstract class AbstractDynamicProxyingHealthService implements HealthServ
             new InvocationHandler() {
             @Override
             public Object invoke(Object aProxy, Method aMethod, Object[] aArgs) 
-            throws Throwable {
+            throws Throwable {            	
             	try {
             		Handler _h = _handlers.get(aMethod);            		
             		if (_h != null)
             			return _h.handle(_health, aComponent, aArgs);
             		return aMethod.invoke(aComponent, aArgs);
-            	} catch (InvocationTargetException anExc) {
+            	} catch (InvocationTargetException anExc) {          		
             		throw anExc.getCause();
             	}
             }
@@ -64,13 +64,13 @@ public abstract class AbstractDynamicProxyingHealthService implements HealthServ
 	}
 
 	@Override
-	public Health get(Object aMaybeMonitored) {
+	public HealthInfo get(Object aMaybeMonitored) {
 		synchronized (lock) {
 			return monitoredComponents.get(aMaybeMonitored);
 		}
 	}
 	
-	private void addComponent(Object aComponent, Health aHealth) {
+	private void addComponent(Object aComponent, HealthInfo aHealth) {
 		synchronized(lock) {
 			monitoredComponents.put(aComponent, aHealth);
 		}
@@ -133,9 +133,9 @@ public abstract class AbstractDynamicProxyingHealthService implements HealthServ
 					Object _result = aMethod.invoke(aProxied, anArgs);			
 					aMonitor.success();
 					return _result;
-				} catch (Throwable aThrowable) {
-					aMonitor.failure(aThrowable);
-					throw aThrowable;
+				} catch (InvocationTargetException anExc) {
+					aMonitor.failure(anExc.getCause());
+					throw anExc;
 				}
 			}			
 		};

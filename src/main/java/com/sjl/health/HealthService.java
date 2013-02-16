@@ -10,7 +10,7 @@ public interface HealthService {
     
     /**
      * @param aMaybeMonitored - the object whose health is being enquired about
-     * @return the Health for that object, if it is monitored, null otherwise
+     * @return the HealthInfo for that object, if it is monitored, null otherwise
      */
-    public Health get(Object aMaybeMonitored);
+    public HealthInfo get(Object aMaybeMonitored);
 }

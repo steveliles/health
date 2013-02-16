@@ -2,6 +2,6 @@ package com.sjl.health;
 
 public interface HealthListener {
 
-	public void onChange(Health.State aFrom, Health.State aTo);
+	public void onChange(HealthInfo.StateInfo aFrom, HealthInfo.StateInfo aTo);
 	
 }

@@ -5,14 +5,12 @@ import org.junit.*;
 
 import com.sjl.health.*;
 
-public class AbstractDynamicProxyingHealthServiceTest {
+public class DynamicProxyingHealthServiceTest {
 
 	private interface SomeInterface {
 		public void method1();
 		public void method2();
 	}
-
-	private class ExpectedException extends RuntimeException{};
 	
 	private class SomeClass implements SomeInterface {
 		private boolean invoked;
@@ -24,7 +22,7 @@ public class AbstractDynamicProxyingHealthServiceTest {
 		
 		@Override
 		public void method2() {
-			throw new ExpectedException();
+			throw expected;
 		}
 		
 		public boolean wasInvoked() {
@@ -33,21 +31,23 @@ public class AbstractDynamicProxyingHealthServiceTest {
 	}
 
 	private Mockery ctx;
-	private UpdateableHealth health;
+	private Health health;
 	private HealthService healthService;
 	private SomeClass uninstrumented;
 	private SomeInterface instrumented;
+	private RuntimeException expected;
 	
 	@Before
 	public void setup() {
 		ctx = new Mockery();
-		health = ctx.mock(UpdateableHealth.class);
-		healthService = new AbstractDynamicProxyingHealthService() {
+		expected = new RuntimeException();
+		health = ctx.mock(Health.class);
+		healthService = new DynamicProxyingHealthService(new HealthFactory(){
 			@Override
-			protected UpdateableHealth newUpdateableHealth() {
+			public Health newHealth() {
 				return health;
-			}			
-		};
+			}
+		});
 		uninstrumented = new SomeClass();
 		instrumented = healthService.monitor(uninstrumented);
 	}
@@ -92,13 +92,13 @@ public class AbstractDynamicProxyingHealthServiceTest {
 	@Test
 	public void tracksUnsuccessfulMethodInvocations() {
 		ctx.checking(new Expectations() {{
-			oneOf(health).failure(with(any(ExpectedException.class)));
+			oneOf(health).failure(expected);			
 		}});
 		
 		try {
 			instrumented.method2();
-		} catch (ExpectedException anExc) {
-			// expected!
+		} catch (Exception anExc) {
+			Assert.assertEquals(expected, anExc);
 		}
 	}
 }
