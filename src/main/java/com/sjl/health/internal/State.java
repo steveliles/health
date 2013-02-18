@@ -1,4 +1,6 @@
-package com.sjl.health;
+package com.sjl.health.internal;
+
+import com.sjl.health.*;
 
 public interface State extends HealthInfo.StateInfo {
 

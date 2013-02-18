@@ -1,4 +1,4 @@
-package com.sjl.health;
+package com.sjl.health.internal;
 
 public interface OperationMonitor {
 

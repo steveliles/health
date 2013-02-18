@@ -1,4 +1,4 @@
-package com.sjl.health.impl;
+package com.sjl.health.internal;
 
 import org.jmock.*;
 import org.junit.*;

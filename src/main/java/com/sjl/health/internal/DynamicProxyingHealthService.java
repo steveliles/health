@@ -1,4 +1,4 @@
-package com.sjl.health.impl;
+package com.sjl.health.internal;
 
 import java.lang.reflect.*;
 import java.util.*;

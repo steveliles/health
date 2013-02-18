@@ -1,18 +1,11 @@
 package com.sjl.health;
 
-import java.util.*;
-
 public interface Issue {
 
-	public Date getWhenFirstOccurred();
-	public Date getMostRecentOccurrence();
+	public Instant getWhenFirstOccurred();
+	public Instant getMostRecentOccurrence();
 	
 	public Statistics getStatistics();
 	
 	public Throwable getCause();
-	
-	interface Statistics {
-		public int getOccurrenceCount();
-		public Frequency getFrequency();
-	}
 }

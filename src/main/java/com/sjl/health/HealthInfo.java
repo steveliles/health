@@ -1,7 +1,5 @@
 package com.sjl.health;
 
-import java.util.*;
-
 public interface HealthInfo {
 	
 	public StateInfo getCurrentState();
@@ -12,8 +10,11 @@ public interface HealthInfo {
 	
 	public interface StateInfo {		
 		public String getName();
-		public Date getWhenChanged();
+		public Instant getWhenChanged();
 		public Issue getWhyChanged();
+		public Statistics getSuccessStats();
+		public Statistics getFailureStats();
+		public Statistics getTotalStats();
 		public Issues getDistinctIssues();	
 	}
 	
