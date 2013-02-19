@@ -12,6 +12,7 @@ public class AbstractStateTest {
 	private IssueTracker tracker;
 	private Issue issue;
 	private Instant instant;
+	private Transition promoter, demoter;
 	
 	@Before
 	public void setup() {
@@ -20,6 +21,8 @@ public class AbstractStateTest {
 		issue = ctx.mock(Issue.class);
 		tracker = ctx.mock(IssueTracker.class);
 		instant = ctx.mock(Instant.class);
+		promoter = ctx.mock(Transition.class, "promoter");
+		demoter = ctx.mock(Transition.class, "demoter");
 	}
 	
 	@After
@@ -37,10 +40,11 @@ public class AbstractStateTest {
 			will(returnValue(12L));
 			
 			ignoring(issue);
-			ignoring(clock);
+			ignoring(clock);			
 		}});
 		
-		State _s = new AbstractState("test", issue, tracker, clock){};
+		State _s = new AbstractState(
+			"test", issue, tracker, promoter, demoter, clock){};
 		Assert.assertEquals(12L, _s.getWhenChanged().getClockTime());
 	}
 	
@@ -50,10 +54,12 @@ public class AbstractStateTest {
 		ctx.checking(new Expectations(){{
 			ignoring(issue);
 			ignoring(clock);
+			ignoring(demoter);
 			oneOf(tracker).log(_exception);
 		}});
 		
-		State _s = new AbstractState("test", issue, tracker, clock){};
+		State _s = new AbstractState(
+			"test", issue, tracker, promoter, demoter, clock){};
 		_s = _s.failure(_exception);
 	}
 }

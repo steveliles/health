@@ -23,14 +23,14 @@ public class DynamicProxyingHealthService implements HealthService {
 	private Object lock = new Object();
 	private HealthFactory healthFactory;
 	private Map<Class<?>, Map<Method, Handler>> instrumentedClasses;
-	private Map<Object, HealthInfo> monitoredComponents;
+	private Map<Object, Health> monitoredComponents;
 	
 	public DynamicProxyingHealthService(HealthFactory aHealthFactory) {
 		healthFactory = aHealthFactory;
 		// use weakhashmaps so we don't create memory leaks by
 		// hanging onto components or classes beyond their natural 
 		// lifecycle.
-		monitoredComponents = new WeakHashMap<Object, HealthInfo>();
+		monitoredComponents = new WeakHashMap<Object, Health>();
 		instrumentedClasses = new WeakHashMap<Class<?>, Map<Method, Handler>>();
 	}
 	
@@ -70,7 +70,15 @@ public class DynamicProxyingHealthService implements HealthService {
 		}
 	}
 	
-	private void addComponent(Object aComponent, HealthInfo aHealth) {
+	public void reset(Object aMaybeMonitored) {
+		synchronized(lock) {
+			Health _h = monitoredComponents.get(aMaybeMonitored);
+			if (_h != null)
+				_h.reset();
+		}
+	}
+	
+	private void addComponent(Object aComponent, Health aHealth) {
 		synchronized(lock) {
 			monitoredComponents.put(aComponent, aHealth);
 		}

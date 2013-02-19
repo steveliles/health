@@ -8,16 +8,25 @@ public abstract class AbstractState implements State {
 	private final String name;
 	private final Issue whyChanged;
 	private final IssueTracker issueTracker;
+	
 	private final MutableStatistics success;
 	private final MutableStatistics failure;
 	
+	private final Transition promoter;
+	private final Transition demoter;
+	
 	public AbstractState(
-		String aName, Issue aWhyChanged, IssueTracker aTracker, Clock aClock) {
+		String aName, Issue aWhyChanged, IssueTracker aTracker, 
+		Transition aPromoter, Transition aDemoter, Clock aClock) {
 		name = aName;
 		whyChanged = ImmutableIssue.create(aWhyChanged);
 		issueTracker = aTracker;
+		
 		success = new ThreadSafeMutableStatistics(aClock);
 		failure = new ThreadSafeMutableStatistics(aClock);
+		
+		promoter = aPromoter;
+		demoter = aDemoter;
 	}
 	
 	@Override
@@ -71,13 +80,13 @@ public abstract class AbstractState implements State {
 	@Override
 	public State success() {
 		success.increment();
-		return this;
+		return promoter.attempt(success, failure);
 	}
 
 	@Override
 	public State failure(Throwable aThrowable) {
 		failure.increment();
 		issueTracker.log(aThrowable);
-		return this;
+		return demoter.attempt(success, failure);
 	}
 }

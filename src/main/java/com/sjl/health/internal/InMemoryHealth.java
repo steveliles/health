@@ -11,7 +11,7 @@ import com.sjl.health.*;
 public class InMemoryHealth implements Health {
 
 	private Object lock;
-	private State state;	
+	private State state;
 	private HistoryManager history;
 	private HealthListeners listeners;
 	
@@ -22,6 +22,11 @@ public class InMemoryHealth implements Health {
 		history = aHistoryManager;
 	}
 	
+	@Override
+	public void reset() {
+		throw new UnsupportedOperationException("TODO");
+	}
+
 	@Override
 	public StateInfo getCurrentState() {
 		return state;

@@ -8,7 +8,7 @@ public interface MutableStatistics extends Statistics {
 	 * add an occurrence of the event that this statistic is being
 	 * used to track.
 	 */
-	public void increment();
+	public long increment();
 	
 	/**
 	 * @return a snapshot in time of the state of the statistics

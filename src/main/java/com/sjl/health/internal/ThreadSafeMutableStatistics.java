@@ -63,8 +63,8 @@ public class ThreadSafeMutableStatistics implements MutableStatistics {
 	}
 
 	@Override
-	public void increment() {
-		counter.incrementAndGet();
+	public long increment() {
+		return counter.incrementAndGet();
 	}
 
 	/**

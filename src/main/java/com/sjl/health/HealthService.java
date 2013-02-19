@@ -13,4 +13,10 @@ public interface HealthService {
      * @return the HealthInfo for that object, if it is monitored, null otherwise
      */
     public HealthInfo get(Object aMaybeMonitored);
+    
+    /**
+     * @param aMaybeMonitored - the object whose health should be reset to the
+     * original state
+     */
+    public void reset(Object aMaybeMonitored);
 }
