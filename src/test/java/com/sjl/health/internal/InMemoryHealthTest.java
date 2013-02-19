@@ -10,7 +10,7 @@ public class InMemoryHealthTest {
 	private Mockery ctx;
 	
 	private Exception expected;
-	private InMemoryHealth health;
+	private SimpleThreadSafeHealth health;
 	private State state1, state2;
 	private HistoryManager history;
 	private HealthListener listener;
@@ -25,7 +25,7 @@ public class InMemoryHealthTest {
 		history = ctx.mock(HistoryManager.class);
 		listener = ctx.mock(HealthListener.class);
 		
-		health = new InMemoryHealth(state1, history);
+		health = new SimpleThreadSafeHealth(state1, history);
 		health.addListener(listener);
 	}
 	

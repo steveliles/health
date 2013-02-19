@@ -1,6 +1,7 @@
 package com.sjl.health.internal;
 
 import com.sjl.health.*;
+import com.sjl.health.internal.immutable.*;
 
 /**
  * TODO: hand-off handling of success/failure to another thread so we don't
@@ -8,14 +9,14 @@ import com.sjl.health.*;
  * 
  * @author steve
  */
-public class InMemoryHealth implements Health {
+public class SimpleThreadSafeHealth implements Health {
 
 	private Object lock;
 	private State state;
 	private HistoryManager history;
 	private HealthListeners listeners;
 	
-	public InMemoryHealth(State anInitialState, HistoryManager aHistoryManager) {
+	public SimpleThreadSafeHealth(State anInitialState, HistoryManager aHistoryManager) {
 		state = anInitialState;
 		lock = new Object();
 		listeners = new HealthListeners();
@@ -59,8 +60,10 @@ public class InMemoryHealth implements Health {
 				history.add(_after);
 		}
 		
-		if (_before != _after) 
-			listeners.onChange(_before, _after);
+		if (!_before.equals(_after))
+			listeners.onChange(
+				ImmutableStateInfo.create(_before), 
+				ImmutableStateInfo.create(_after));
 	}
 
 	@Override
@@ -75,8 +78,10 @@ public class InMemoryHealth implements Health {
 				history.add(_after);
 		}
 		
-		if (_before != _after)
-			listeners.onChange(_before, _after);
+		if (!_before.equals(_after))
+			listeners.onChange(
+				ImmutableStateInfo.create(_before), 
+				ImmutableStateInfo.create(_after));
 	}
 
 }
