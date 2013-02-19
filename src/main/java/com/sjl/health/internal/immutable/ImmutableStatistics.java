@@ -23,6 +23,20 @@ public final class ImmutableStatistics implements Statistics {
 			aStatistics.getOccurrenceCount());
 	}
 	
+	public static ImmutableStatistics combine(Statistics aS1, Statistics aS2) {
+		Instant _start = ImmutableInstant.earliest(
+			aS1.getPeriod().getStart(),
+			aS2.getPeriod().getStart());
+			
+		Instant _end = ImmutableInstant.latest(
+			aS1.getPeriod().getEnd(),
+			aS2.getPeriod().getEnd());
+		
+		return ImmutableStatistics.create(
+			ImmutableTimePeriod.create(_start, _end),
+			aS1.getOccurrenceCount() + aS2.getOccurrenceCount());
+	}
+	
 	private final ImmutableTimePeriod period;
 	private final ImmutableFrequency frequency;
 	private final long count;

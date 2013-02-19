@@ -2,9 +2,9 @@ package com.sjl.health;
 
 public interface InternallyIterable<T> {
 
-	public <R> R each(Callback<T, R> aCallback);
+	public void each(Callback<T> aCallback);
 	
-	interface Callback<T, R> {
-		public R with(T aT);		
+	interface Callback<T> {
+		public void with(T aT);		
 	}
 }

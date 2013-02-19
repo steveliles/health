@@ -61,20 +61,8 @@ public abstract class AbstractState implements State {
 	
 	@Override
 	public Statistics getTotalStats() {
-		Statistics _success = success.snapshot();
-		Statistics _failure = failure.snapshot();
-		
-		Instant _start = ImmutableInstant.earliest(
-			_success.getPeriod().getStart(),
-			_failure.getPeriod().getStart());
-		
-		Instant _end = ImmutableInstant.latest(
-			_success.getPeriod().getEnd(),
-			_failure.getPeriod().getEnd());
-		
-		return ImmutableStatistics.create(
-			ImmutableTimePeriod.create(_start, _end),
-			_success.getOccurrenceCount() + _failure.getOccurrenceCount());
+		return ImmutableStatistics.combine(
+			success.snapshot(), failure.snapshot());
 	}
 
 	@Override
