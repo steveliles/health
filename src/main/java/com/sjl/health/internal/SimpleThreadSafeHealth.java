@@ -50,38 +50,42 @@ public class SimpleThreadSafeHealth implements Health {
 
 	@Override
 	public void success() {
-		State _before, _after = null;
+		StateInfo _before, _after = null;
 		
 		synchronized(lock) {
 			_before = state;
 			state = state.success();
 			_after = state;
-			if (_before != _after)
+			
+			if (_before != _after) {
 				history.add(_after);
+				_before = ImmutableStateInfo.create(_before);
+				_after = ImmutableStateInfo.create(_after);
+			}
 		}
 		
 		if (!_before.equals(_after))
-			listeners.onChange(
-				ImmutableStateInfo.create(_before), 
-				ImmutableStateInfo.create(_after));
+			listeners.onChange(_before, _after);
 	}
 
 	@Override
 	public void failure(Throwable aCause) {
-		State _before, _after = null;
+		StateInfo _before, _after = null;
 		
 		synchronized(lock) {
 			_before = state;
 			state = state.failure(aCause);
 			_after = state;
-			if (_before != _after)
+			
+			if (_before != _after) {
 				history.add(_after);
+				_before = ImmutableStateInfo.create(_before);
+				_after = ImmutableStateInfo.create(_after);
+			}
 		}
 		
 		if (!_before.equals(_after))
-			listeners.onChange(
-				ImmutableStateInfo.create(_before), 
-				ImmutableStateInfo.create(_after));
+			listeners.onChange(_before, _after);
 	}
 
 }

@@ -3,7 +3,7 @@ package com.sjl.health.internal;
 import com.sjl.health.*;
 import com.sjl.health.internal.immutable.*;
 
-public abstract class AbstractState implements State {
+public class MutableState implements State {
 
 	private final String name;
 	private final Issue whyChanged;
@@ -15,7 +15,7 @@ public abstract class AbstractState implements State {
 	private final Transition promoter;
 	private final Transition demoter;
 	
-	public AbstractState(
+	public MutableState(
 		String aName, Issue aWhyChanged, IssueTracker aTracker, 
 		Transition aPromoter, Transition aDemoter, Clock aClock) {
 		name = aName;

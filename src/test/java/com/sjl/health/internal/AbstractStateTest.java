@@ -45,7 +45,7 @@ public class AbstractStateTest {
 			ignoring(clock);			
 		}});
 		
-		State _s = new AbstractState(
+		State _s = new MutableState(
 			"test", issue, tracker, promoter, demoter, clock){};
 		Assert.assertEquals(12L, _s.getWhenChanged().getClockTime());
 	}
@@ -60,7 +60,7 @@ public class AbstractStateTest {
 			oneOf(tracker).log(_exception);
 		}});
 		
-		State _s = new AbstractState(
+		State _s = new MutableState(
 			"test", issue, tracker, promoter, demoter, clock){};
 		_s = _s.failure(_exception);
 	}
@@ -77,7 +77,7 @@ public class AbstractStateTest {
 			will(returnValue(next));
 		}});
 		
-		State _s = new AbstractState(
+		State _s = new MutableState(
 			"test", issue, tracker, promoter, demoter, clock){};
 		Assert.assertEquals(next, _s.success());
 	}
@@ -95,7 +95,7 @@ public class AbstractStateTest {
 			will(returnValue(next));
 		}});
 		
-		State _s = new AbstractState(
+		State _s = new MutableState(
 			"test", issue, tracker, promoter, demoter, clock){};
 		Assert.assertEquals(next, _s.failure(new Exception()));
 	}
