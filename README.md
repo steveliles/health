@@ -15,10 +15,10 @@ What follows is currently just a thought-experiment in what configuring monitori
 
 Configure four states - "ok", "warn", "failing" and "dead" - described by successively greater error/success ratios. Send email when "warn" state reached, page ops when "failing", restart the service when "dead":
 
-	final HealthService hs = &hellip;;
-	final MyComponent my = &hellip;;
+	final HealthService hs = . . .;
+	final MyComponent my = . . .;
 	
-	&hellip;
+	. . .
 	
 	final MyComponent myMonitored = _hs.monitor(my,
 		Transitions.from("ok").to("warn").when(
@@ -28,15 +28,15 @@ Configure four states - "ok", "warn", "failing" and "dead" - described by succes
 		Transitions.from("failing").to("dead").when(
 			Exceptions.ratioExceeds(1/10))));
 	
-	&hellip;
+	. . .
 	
 	final HealthInfo myHealth = hs.get(myMonitored);
 	myHealth.addListener(new HealthListener() {
 	    public void onChange(StateInfo aFrom, StateInfo aTo) {
 	        if ("warn".equals(aTo.getName())) {
-	        	sendMail(&hellip;);
+	        	sendMail(. . .);
 	        } else if ("failing".equals(aTo.getName())) {
-	        	pageOps(&hellip;);
+	        	pageOps(. . .);
 	        } else if ("dead".equals(aTo.getName())) {
 	        	myMonitored.restart();
 	        	hs.reset(myMonitored, "ok");
@@ -49,10 +49,10 @@ Unless otherwise specified, transitions to higher/better states are automaticall
 
 States for success/error ratio's as in the previous example, and a parallel, orthogonal state-set for monitoring throughput:
 
-	final HealthService hs = &hellip;;
-	final MyComponent my = &hellip;;
+	final HealthService hs = . . .;
+	final MyComponent my = . . .;
 	
-	&hellip;
+	. . .
 	
 	final MyComponent myHealthy = _hs.monitor(my,
 		Transitions.from("ok").to("warn").when(
@@ -62,7 +62,7 @@ States for success/error ratio's as in the previous example, and a parallel, ort
 		Transitions.from("failing").to("dead").when(
 			Exceptions.ratioExceeds(1/10))));
 	
-	&hellip;
+	. . .
 	
 	final MyComponent mySpeedy = _hs.monitor(myHealthy,
 		Transitions.from("fast").to("slow").when(
