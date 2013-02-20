@@ -1,9 +1,12 @@
 package com.sjl.health.internal;
 
+import org.hamcrest.*;
 import org.jmock.*;
 import org.junit.*;
 
+import com.sjl.health.HealthInfo.StateInfo;
 import com.sjl.health.*;
+import com.sjl.health.internal.immutable.*;
 
 public class InMemoryHealthTest {
 
@@ -11,6 +14,7 @@ public class InMemoryHealthTest {
 	
 	private Exception expected;
 	private SimpleThreadSafeHealth health;
+	private InitialStateFactory stateFactory;
 	private State state1, state2;
 	private HistoryManager history;
 	private HealthListener listener;
@@ -24,8 +28,14 @@ public class InMemoryHealthTest {
 		state2 = ctx.mock(State.class, "s2");
 		history = ctx.mock(HistoryManager.class);
 		listener = ctx.mock(HealthListener.class);
+		stateFactory = ctx.mock(InitialStateFactory.class);
 		
-		health = new SimpleThreadSafeHealth(state1, history);
+		ctx.checking(new Expectations() {{
+			allowing(stateFactory).newInitialState(); 
+			will(returnValue(state1));	
+		}});
+		
+		health = new SimpleThreadSafeHealth(stateFactory, history);
 		health.addListener(listener);
 	}
 	
@@ -61,7 +71,12 @@ public class InMemoryHealthTest {
 			oneOf(state1).success();
 			will(returnValue(state2));
 			
-			oneOf(listener).onChange(state1, state2);
+			allowingAllGetMethods(state1, "s1");
+			allowingAllGetMethods(state2, "s2");
+			
+			oneOf(listener).onChange(
+				with(any(State.class)), 
+				with(any(State.class)));
 		}});
 		
 		health.success();
@@ -75,9 +90,60 @@ public class InMemoryHealthTest {
 			oneOf(state1).failure(expected);
 			will(returnValue(state2));
 			
-			oneOf(listener).onChange(state1, state2);
+			allowingAllGetMethods(state1, "s1");
+			allowingAllGetMethods(state2, "s2");
+			
+			oneOf(listener).onChange(
+				with(any(State.class)), 
+				with(any(State.class)));
 		}});
 		
 		health.failure(expected);
+	}
+	
+	@Test
+	public void listenersReceiveImmutableCopiesOfStates() {
+		ctx.checking(new Expectations() {{
+			ignoring(history);
+			
+			oneOf(state1).failure(expected);
+			will(returnValue(state2));
+			
+			allowingAllGetMethods(state1, "s1");
+			allowingAllGetMethods(state2, "s2");
+			
+			oneOf(listener).onChange(
+				with(immutableState("s1")), 
+				with(immutableState("s2")));
+		}});
+		
+		health.failure(expected);
+	}
+	
+	private Matcher<StateInfo> immutableState(final String aName) {
+		return new BaseMatcher<StateInfo>() {
+			@Override
+			public boolean matches(Object aStateInfo) {				
+				return 
+					(aStateInfo instanceof ImmutableStateInfo) && 
+					(aName.equals(((ImmutableStateInfo)aStateInfo).getName()));
+			}
+
+			@Override
+			public void describeTo(Description aDescription) {
+				aDescription.appendText("ImmutableStateInfo(" + aName +")");
+			}
+		};
+	}
+	
+	private void allowingAllGetMethods(final State aState, final String aStateName) {
+		ctx.checking(new Expectations(){{
+			oneOf(aState).getName(); will(returnValue(aStateName));
+			oneOf(aState).getSuccessStats();
+			oneOf(aState).getFailureStats();
+			oneOf(aState).getWhenChanged();
+			oneOf(aState).getWhyChanged();
+			oneOf(aState).getDistinctIssues();
+		}});
 	}
 }

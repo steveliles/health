@@ -36,9 +36,9 @@ public class DynamicProxyingHealthService implements HealthService {
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T monitor(final T aComponent) {
+	public <T> T monitor(final T aComponent, Configuration aConfig) {
 		final Map<Method, Handler> _handlers = getHandlers(aComponent.getClass());
-		final Health _health = healthFactory.newHealth();
+		final Health _health = healthFactory.newHealth(aConfig);
 		
 		T _instrumented = (T) Proxy.newProxyInstance(
 			aComponent.getClass().getClassLoader(), 

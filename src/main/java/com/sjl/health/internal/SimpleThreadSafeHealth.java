@@ -11,15 +11,17 @@ import com.sjl.health.internal.immutable.*;
  */
 public class SimpleThreadSafeHealth implements Health {
 
-	private Object lock;
 	private State state;
-	private HistoryManager history;
-	private HealthListeners listeners;
-	private StateInvoker success;
-	private StateInvoker failure;
 	
-	public SimpleThreadSafeHealth(State anInitialState, HistoryManager aHistoryManager) {
-		state = anInitialState;
+	private final InitialStateFactory factory;
+	private final Object lock;	
+	private final HistoryManager history;
+	private final HealthListeners listeners;
+	private final StateInvoker success;
+	private final StateInvoker failure;
+	
+	public SimpleThreadSafeHealth(InitialStateFactory aFactory, HistoryManager aHistoryManager) {
+		factory = aFactory;		
 		lock = new Object();
 		listeners = new HealthListeners();
 		history = aHistoryManager;
@@ -35,11 +37,15 @@ public class SimpleThreadSafeHealth implements Health {
 				return state.failure(aMaybe);
 			}
 		};
+		
+		state = factory.newInitialState();
 	}
 	
 	@Override
 	public void reset() {
-		throw new UnsupportedOperationException("TODO");
+		synchronized(lock) {
+			state = factory.newInitialState();
+		}
 	}
 
 	@Override
@@ -72,7 +78,7 @@ public class SimpleThreadSafeHealth implements Health {
 		failure.invoke(aCause);
 	}
 	
-	abstract class StateInvoker {
+	private abstract class StateInvoker {
 		
 		protected abstract State invokeImpl(Throwable aMaybe);
 		

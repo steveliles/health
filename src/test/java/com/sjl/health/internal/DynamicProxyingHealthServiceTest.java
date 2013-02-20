@@ -36,20 +36,25 @@ public class DynamicProxyingHealthServiceTest {
 	private SomeClass uninstrumented;
 	private SomeInterface instrumented;
 	private RuntimeException expected;
+	private Configuration config;
+	private HealthFactory healthFactory;
 	
 	@Before
 	public void setup() {
 		ctx = new Mockery();
 		expected = new RuntimeException();
 		health = ctx.mock(Health.class);
-		healthService = new DynamicProxyingHealthService(new HealthFactory(){
-			@Override
-			public Health newHealth() {
-				return health;
-			}
-		});
-		uninstrumented = new SomeClass();
-		instrumented = healthService.monitor(uninstrumented);
+		config = ctx.mock(Configuration.class);
+		healthFactory = ctx.mock(HealthFactory.class);
+		healthService = new DynamicProxyingHealthService(healthFactory);
+		uninstrumented = new SomeClass();		
+		
+		ctx.checking(new Expectations() {{
+			allowing(healthFactory).newHealth(config);
+			will(returnValue(health));
+		}});
+		
+		instrumented = healthService.monitor(uninstrumented, config);
 	}
 	
 	@After
