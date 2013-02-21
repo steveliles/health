@@ -73,7 +73,8 @@ public class AbstractStateTest {
 			
 			oneOf(promoter).attempt(
 				with(any(Statistics.class)), 
-				with(any(Statistics.class)));
+				with(any(Statistics.class)), 
+				null);
 			will(returnValue(next));
 		}});
 		
@@ -91,7 +92,8 @@ public class AbstractStateTest {
 			
 			oneOf(demoter).attempt(
 				with(any(Statistics.class)), 
-				with(any(Statistics.class)));
+				with(any(Statistics.class)),
+				null);
 			will(returnValue(next));
 		}});
 		

@@ -4,6 +4,6 @@ import com.sjl.health.*;
 
 public interface Transition {
 
-	public State attempt(Statistics aSuccess, Statistics aFailure);
+	public State attempt(Statistics aSuccess, Statistics aFailure, Throwable aMaybeIssue);
 	
 }

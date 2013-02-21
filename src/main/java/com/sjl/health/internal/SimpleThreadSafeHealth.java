@@ -38,13 +38,13 @@ public class SimpleThreadSafeHealth implements Health {
 			}
 		};
 		
-		state = factory.newInitialState();
+		state = factory.newInitialState(null);
 	}
 	
 	@Override
 	public void reset() {
 		synchronized(lock) {
-			state = factory.newInitialState();
+			state = factory.newInitialState(null); // TODO: create an issue
 		}
 	}
 

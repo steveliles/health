@@ -36,7 +36,8 @@ public class MutableState implements State {
 
 	@Override
 	public Instant getWhenChanged() {
-		return whyChanged.getMostRecentOccurrence();
+		return (whyChanged == null) ? 
+			null : whyChanged.getMostRecentOccurrence();
 	}
 
 	@Override
@@ -68,13 +69,15 @@ public class MutableState implements State {
 	@Override
 	public State success() {
 		success.increment();
-		return promoter.attempt(success, failure);
+		return (promoter == null) ? 
+			this : promoter.attempt(success, failure, null);
 	}
 
 	@Override
 	public State failure(Throwable aThrowable) {
 		failure.increment();
 		issueTracker.log(aThrowable);
-		return demoter.attempt(success, failure);
+		return (demoter == null) ? 
+			this : demoter.attempt(success, failure, aThrowable);
 	}
 }

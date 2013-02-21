@@ -31,7 +31,7 @@ public class InMemoryHealthTest {
 		stateFactory = ctx.mock(InitialStateFactory.class);
 		
 		ctx.checking(new Expectations() {{
-			allowing(stateFactory).newInitialState(); 
+			allowing(stateFactory).newInitialState(null); 
 			will(returnValue(state1));	
 		}});
 		

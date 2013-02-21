@@ -20,12 +20,17 @@ public class DynamicProxyingHealthService implements HealthService {
 		throws Throwable;
 	}
 	
-	private Object lock = new Object();
-	private HealthFactory healthFactory;
-	private Map<Class<?>, Map<Method, Handler>> instrumentedClasses;
-	private Map<Object, Health> monitoredComponents;
+	private final Object lock = new Object();
+	private final HealthFactory healthFactory;
+	private final IssueTrackerFactory issueTrackerFactory;
+	private final Clock clock;
+	private final Map<Class<?>, Map<Method, Handler>> instrumentedClasses;
+	private final Map<Object, Health> monitoredComponents;
 	
-	public DynamicProxyingHealthService(HealthFactory aHealthFactory) {
+	public DynamicProxyingHealthService(
+		HealthFactory aHealthFactory, IssueTrackerFactory anIssues, Clock aClock) {
+		issueTrackerFactory = anIssues;
+		clock = aClock;
 		healthFactory = aHealthFactory;
 		// use weakhashmaps so we don't create memory leaks by
 		// hanging onto components or classes beyond their natural 
@@ -37,6 +42,7 @@ public class DynamicProxyingHealthService implements HealthService {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T monitor(final T aComponent, Configuration aConfig) {
+		aConfig.init(issueTrackerFactory, clock);
 		final Map<Method, Handler> _handlers = getHandlers(aComponent.getClass());
 		final Health _health = healthFactory.newHealth(aConfig);
 		

@@ -4,6 +4,9 @@ import com.sjl.health.internal.*;
 
 public interface Configuration extends InitialStateFactory {
 	
-	public State newStateInstance(String aStateName);
+	// TODO: this sucks, and here just so we get a nice dsl? hmmmm 
+	public void init(IssueTrackerFactory anIssueTrackerFactory, Clock aClock);
+	
+	public State newStateInstance(String aStateName, Issue anIssue);
 	
 }

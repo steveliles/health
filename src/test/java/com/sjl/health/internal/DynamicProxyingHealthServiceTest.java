@@ -46,7 +46,8 @@ public class DynamicProxyingHealthServiceTest {
 		health = ctx.mock(Health.class);
 		config = ctx.mock(Configuration.class);
 		healthFactory = ctx.mock(HealthFactory.class);
-		healthService = new DynamicProxyingHealthService(healthFactory);
+		healthService = new DynamicProxyingHealthService(
+			healthFactory, null, null);
 		uninstrumented = new SomeClass();		
 		
 		ctx.checking(new Expectations() {{
