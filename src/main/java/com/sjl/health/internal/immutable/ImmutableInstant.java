@@ -10,7 +10,7 @@ public final class ImmutableInstant implements Instant {
 	
 	public static ImmutableInstant create(Instant anInstant) {
 		if (anInstant == null)
-			throw new IllegalArgumentException("instant cannot be null");
+			return null;
 		
 		if (anInstant instanceof ImmutableInstant)
 			return (ImmutableInstant) anInstant;
@@ -83,5 +83,10 @@ public final class ImmutableInstant implements Instant {
 		if (clockTime != other.clockTime)
 			return false;
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		return clockTime + "";
 	}
 }

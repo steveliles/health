@@ -58,21 +58,29 @@ public class SampleConfiguration {
 			    when(Exceptions.ratioFallsBelow(1f/110f))));
 		
 		HealthInfo _info = _health.get(_component);
-		System.out.println(_info.getCurrentState().getName());
+		System.out.println(_info);
 		
-		for (int i=0; i<20; i++)
-			_myMonitored.method1();
-		System.out.println(_info.getCurrentState().getName());
-		
-		_myMonitored.method2();
-		System.out.println(_info.getCurrentState().getName());
-		
-		_myMonitored.method2();
-		System.out.println(_info.getCurrentState().getName());
-		
-		for (int i=0; i<20; i++)
-			_myMonitored.method1();
-		System.out.println(_info.getCurrentState().getName());
+		succeedNTimes(_myMonitored, _info, 20);		
+		failNTimes(_myMonitored, _info, 5);
+		succeedNTimes(_myMonitored, _info, 20);
+	}
+
+	private void failNTimes(MyComponent aMonitored, HealthInfo anInfo, int aTimes) {
+		for (int i=0; i<aTimes; i++) {
+			try {
+				aMonitored.method2();
+			} catch (RuntimeException anExc) {
+				// expected
+			}
+			System.out.println(anInfo);
+		}
+	}
+
+	private void succeedNTimes(MyComponent aComponent, HealthInfo anInfo, int aTimes) {
+		for (int i=0; i<aTimes; i++) {
+			aComponent.method1();
+			System.out.println(anInfo);
+		}
 	}
 	
 	public static void main(String[] anArgs) {

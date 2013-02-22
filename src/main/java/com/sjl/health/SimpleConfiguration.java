@@ -55,8 +55,23 @@ public class SimpleConfiguration implements Configuration {
 					return new MutableState(
 						_tp.getName(), aCause, anIssues, _tp.getPromotion(), _tp.getDemotion(), aClock);
 				}
+				public String toString() {
+					return "+" + _tp.getPromotion() + "/-" + _tp.getDemotion(); 
+				}
 			});
 		}
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder _sb = new StringBuilder();
+		for (Map.Entry<String, StateFactory> _e : states.entrySet()) {
+			_sb.append(_e.getKey());
+			_sb.append("\r\n  ");
+			_sb.append(_e.getValue());
+			_sb.append("\r\n");
+		}
+		return _sb.toString();
 	}
 	
 	@Override

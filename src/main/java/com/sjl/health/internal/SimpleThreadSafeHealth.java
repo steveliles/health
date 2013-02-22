@@ -101,4 +101,9 @@ public class SimpleThreadSafeHealth implements Health {
 				listeners.onChange(_before, _after);
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return "health - " + getCurrentState().toString();
+	}
 }

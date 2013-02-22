@@ -6,8 +6,15 @@ public class Exceptions {
 		return new Condition() {
 			@Override
 			public boolean test(Statistics aSuccess, Statistics aFailure) {
-				return aRatio > (aFailure.getOccurrenceCount() / aSuccess.getOccurrenceCount());
-			}			
+				double _ratio = (aSuccess.getOccurrenceCount() == 0) ?
+					1d : (aFailure.getOccurrenceCount() / aSuccess.getOccurrenceCount());
+				return aRatio > _ratio;
+			}
+			
+			@Override
+			public String toString() {
+				return "[ratio-exceeds:" + aRatio + "]";
+			}
 		};
 	}
 	
@@ -15,8 +22,15 @@ public class Exceptions {
 		return new Condition() {
 			@Override
 			public boolean test(Statistics aSuccess, Statistics aFailure) {
-				return aRatio < (aFailure.getOccurrenceCount() / aSuccess.getOccurrenceCount());
-			}			
+				double _ratio = (aSuccess.getOccurrenceCount() == 0) ?
+					1d : (aFailure.getOccurrenceCount() / aSuccess.getOccurrenceCount());
+				return aRatio < _ratio;
+			}
+			
+			@Override
+			public String toString() {
+				return "[ratio-below:" + aRatio + "]";
+			}
 		};
 	}
 	

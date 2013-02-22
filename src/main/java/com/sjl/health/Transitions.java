@@ -50,6 +50,11 @@ public class Transitions {
 						aStates.newStateInstance(to, null): // TODO: create promote issue 
 						aStates.newStateInstance(from, null); // TODO: create demote issue
 				}
+				
+				@Override
+				public String toString() {
+					return to + " when:" + when.toString();
+				}
 			};
 		}
 	}

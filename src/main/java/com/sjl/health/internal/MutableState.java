@@ -6,6 +6,7 @@ import com.sjl.health.internal.immutable.*;
 public class MutableState implements State {
 
 	private final String name;
+	private final ImmutableInstant whenChanged;
 	private final Issue whyChanged;
 	private final IssueTracker issueTracker;
 	
@@ -20,6 +21,8 @@ public class MutableState implements State {
 		Transition aPromoter, Transition aDemoter, Clock aClock) {
 		name = aName;
 		whyChanged = ImmutableIssue.create(aWhyChanged);
+		whenChanged = ImmutableInstant.create((whyChanged != null) ? 
+			whyChanged.getWhenFirstOccurred() : ImmutableInstant.create(aClock.now()));
 		issueTracker = aTracker;
 		
 		success = new ThreadSafeMutableStatistics(aClock);
@@ -36,8 +39,7 @@ public class MutableState implements State {
 
 	@Override
 	public Instant getWhenChanged() {
-		return (whyChanged == null) ? 
-			null : whyChanged.getMostRecentOccurrence();
+		return whenChanged;
 	}
 
 	@Override
@@ -68,16 +70,44 @@ public class MutableState implements State {
 
 	@Override
 	public State success() {
-		success.increment();
-		return (promoter == null) ? 
-			this : promoter.attempt(success, failure, null);
+		try {
+			success.increment();
+			return (promoter == null) ? 
+				this : promoter.attempt(success, failure, null);
+		} catch (Throwable aT) {
+			aT.printStackTrace(); // TODO: logging
+			return this;
+		}
 	}
 
 	@Override
 	public State failure(Throwable aThrowable) {
-		failure.increment();
-		issueTracker.log(aThrowable);
-		return (demoter == null) ? 
-			this : demoter.attempt(success, failure, aThrowable);
+		try {
+			failure.increment();
+			issueTracker.log(aThrowable);
+			return (demoter == null) ? 
+				this : demoter.attempt(success, failure, aThrowable);
+		} catch (Throwable aT) {
+			aT.printStackTrace(); // TODO: logging
+			return this;
+		}
+	}
+	
+	public String toString() {
+		StringBuilder _sb = new StringBuilder();
+		_sb.append(name);
+		_sb.append(" @");
+		_sb.append(whenChanged);
+		_sb.append(" ");
+		if (whyChanged != null) {
+			_sb.append("(");
+			_sb.append(whyChanged.getCause().getMessage());
+			_sb.append("), ");
+		}
+		_sb.append(getFailureStats().getOccurrenceCount());
+		_sb.append("/");
+		_sb.append(getTotalStats().getOccurrenceCount());
+		_sb.append(" errors/invocations");
+		return _sb.toString();
 	}
 }
