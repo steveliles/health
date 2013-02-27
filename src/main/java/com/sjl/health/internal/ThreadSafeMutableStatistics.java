@@ -1,25 +1,28 @@
 package com.sjl.health.internal;
 
-import java.util.concurrent.atomic.*;
-
 import com.sjl.health.*;
 import com.sjl.health.internal.immutable.*;
 
 public class ThreadSafeMutableStatistics implements MutableStatistics {
 
-	private Clock clock;
-	private Instant created;
-	private AtomicLong counter;
+	private final Clock clock;
+	private final Instant created;
+	private final Object lock;
+	
+	private long counter;
 	
 	public ThreadSafeMutableStatistics(Clock aClock) {
 		clock = aClock;
 		created = ImmutableInstant.create(clock.now());
-		counter = new AtomicLong();
+		counter = 0;
+		lock = new Object();
 	}
 	
 	@Override
 	public long getOccurrenceCount() {
-		return counter.get();
+		synchronized(lock) {
+			return counter;
+		}
 	}
 
 	/**
@@ -32,7 +35,9 @@ public class ThreadSafeMutableStatistics implements MutableStatistics {
 		return new Frequency() {
 			@Override
 			public double getHertz() {
-				return (counter.get() / getPeriod().getMilliseconds()) / 1000d;
+				synchronized(lock) {
+					return (counter / getPeriod().getMilliseconds()) / 1000d;
+				}
 			}
 		};
 	}
@@ -64,7 +69,10 @@ public class ThreadSafeMutableStatistics implements MutableStatistics {
 
 	@Override
 	public long increment() {
-		return counter.incrementAndGet();
+		synchronized(lock) {
+			counter++;
+			return counter;
+		}
 	}
 
 	/**
@@ -72,8 +80,13 @@ public class ThreadSafeMutableStatistics implements MutableStatistics {
 	 */
 	@Override
 	public Statistics snapshot() {
-		final Instant _end = clock.now();
-		final long _count = counter.get();
+		Instant _end = null;
+		long _count = 0;
+		
+		synchronized(lock) {
+			_end = clock.now();
+			_count = counter;
+		}
 		
 		return ImmutableStatistics.create(
 			ImmutableTimePeriod.create(created, _end), _count);

@@ -45,7 +45,7 @@ public class SampleConfiguration {
 		}; 
 		
 		HealthService _health = new DynamicProxyingHealthService(
-			_hf, new InMemoryIssueTrackerFactory(), _clock); 
+			_hf, new InMemoryIssueTrackerFactory(_clock), _clock); 
 		
 		MyComponent _myMonitored = _health.monitor(_component, new SimpleConfiguration(
 			Transitions.demote("ok").to("failing").
@@ -70,7 +70,7 @@ public class SampleConfiguration {
 			try {
 				aMonitored.method2();
 			} catch (RuntimeException anExc) {
-				// expected
+				anExc.printStackTrace();// expected
 			}
 			System.out.println(anInfo);
 		}
