@@ -70,7 +70,8 @@ public class SampleConfiguration {
 			try {
 				aMonitored.method2();
 			} catch (RuntimeException anExc) {
-				anExc.printStackTrace();// expected
+				// expected
+				// anExc.printStackTrace();
 			}
 			System.out.println(anInfo);
 		}
