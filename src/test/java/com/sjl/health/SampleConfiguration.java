@@ -60,8 +60,10 @@ public class SampleConfiguration {
 		HealthInfo _info = _health.get(_component);
 		System.out.println(_info);
 		
-		succeedNTimes(_myMonitored, _info, 20);		
-		failNTimes(_myMonitored, _info, 5);
+		succeedNTimes(_myMonitored, _info, 100);		
+		failNTimes(_myMonitored, _info, 1);
+		succeedNTimes(_myMonitored, _info, 10);
+		failNTimes(_myMonitored, _info, 1);
 		succeedNTimes(_myMonitored, _info, 20);
 	}
 

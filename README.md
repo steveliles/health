@@ -1,6 +1,6 @@
 # Java Component-Health Monitoring
 
-Experimenting with programmatic in-VM monitoring of Java applications, with the following aims:
+Very early-stage experiment in programmatic in-VM monitoring of Java applications, with the following aims:
 
 * Low-overhead real-time monitoring of programmer-specified objects within a Java application
 * Flexible health "states" - define your own states and criteria that control state changes (e.g. "ok" when less than 1 exception per 10,000 invocations, or "warn" when method invocation time exceeds 3 seconds, or &hellip;)

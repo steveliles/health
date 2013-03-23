@@ -23,21 +23,11 @@ public class SimpleConfiguration implements Configuration {
 	}
 	
 	public void init(IssueTrackerFactory anIssueTrackerFactory, Clock aClock) {
-		TransitionPairs _pairs = new TransitionPairs();
-		
 		states = new HashMap<String, StateFactory>();
 		clock = aClock;
 		issuesFactory = anIssueTrackerFactory;
 		
-		for (TransitionBuilder _b : builders) {
-			if (_b.isDemotion()) {
-				_pairs.addDemoter(_b.getFrom(), _b.build(this));
-			} else {
-				_pairs.addPromoter(_b.getFrom(), _b.build(this));
-			}
-		}
-		
-		_pairs.validate();
+		TransitionPairs _pairs = initialiseTransitionPairs();
 		
 		final TransitionPair _top = 
 			_pairs.getInitialStateTransitionPair();
@@ -49,7 +39,25 @@ public class SimpleConfiguration implements Configuration {
 			}			
 		};
 		
-		for (final TransitionPair _tp : _pairs) {
+		initialiseHealthStates(_pairs);
+	}
+	
+	private TransitionPairs initialiseTransitionPairs() {
+		TransitionPairs _pairs = new TransitionPairs();
+		for (TransitionBuilder _b : builders) {
+			if (_b.isDemotion()) {
+				_pairs.addDemoter(_b.getFrom(), _b.build(this));
+			} else {
+				_pairs.addPromoter(_b.getFrom(), _b.build(this));
+			}
+		}
+		
+		_pairs.validate();
+		return _pairs;
+	}
+
+	private void initialiseHealthStates(TransitionPairs aTransitionPairs) {
+		for (final TransitionPair _tp : aTransitionPairs) {
 			states.put(_tp.getName(), new StateFactory() {
 				public State newState(Issue aCause, IssueTracker anIssues, Clock aClock) {
 					return new MutableState(
